@@ -11,8 +11,8 @@ var ArticleSchema = new Schema({
         type: String,
         required: true
     },
-    date: {
-        type: Date,
+    authorDate: {
+        type: String,
         required: true
     },
     summary: {

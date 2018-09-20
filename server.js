@@ -14,22 +14,25 @@ app.use(logger("dev"));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost/newscrape", {useNewUrlParser:true});
+mongoose.connect("mongodb://localhost/newscraper", { useNewUrlParser: true });
 
 app.get("/scrape", function(req, res) {
-    axios.get("https://www.livescience.com/news").then(function(response) {
+    axios.get("http://blogs.discovermagazine.com/").then(function(response) {
         var $ = cheerio.load(response.data);
 
-        $(".search-item").each(function(i, element) {
+        $("div.entry.clearfix").each(function(i, element) {
             var result = {};
 
-            result.title = $(this)
-                .children().children().children("a").text();
-            result.link = $(this)
-                .children("a").attr("href");
-            
-            result.summary = $(this)
-                .children("p").text();
+            // result.title = $(this).children("a").text();
+            // result.link = $(this).children("a").attr("href");
+            // result.authorDate = $(this).next().children("span").text();
+            // result.summary = $(this).next().next().text();
+
+
+            result.title = $(this).children("h2").children("a").text();
+            result.link = $(this).children("h2").children("a").attr("href");
+            result.authorDate = $(this).children("div.meta").children("span").text();
+            result.summary = $(this).children("p").text();
 
             db.Article.create(result)
                 .then(function(dbArticle) {
@@ -61,6 +64,9 @@ app.get("/articles/:id", function(req, res) {
     .populate("note")
     .then(function(dbArticle) {
       res.json(dbArticle);
+    })
+    .catch(function(err) {
+        res.json(err);
     });
 });
 
@@ -72,8 +78,8 @@ app.post("/articles/:id", function(req, res) {
     .then(function(dbNote) {
       return db.Article.update({_id: article}, {$push: {note: dbNote._id}}, {new: true});
     })
-    .then(function(article) {
-      res.json(article);
+    .then(function(dbArticle) {
+      res.json(dbArticle);
     })
     .catch(function(err) {
       res.json(err);
