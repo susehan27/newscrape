@@ -39,6 +39,7 @@ app.get("/scrape", function(req, res) {
             result.link = $(this).children("h2").children("a").attr("href");
             result.authorDate = $(this).children("div.meta").children("span").text();
             result.summary = $(this).children("p").text();
+            result.image = $(this).children("div.post-thumb").children("img").attr("src");
 
             db.Article.create(result)
                 .then(function(dbArticle) {
@@ -90,6 +91,18 @@ app.post("/articles/:id", function(req, res) {
     .catch(function(err) {
       res.json(err);
     });
+});
+
+app.delete("/articles/", function(req, res) {
+    var articles = req.body.data;
+
+    db.Article.deleteMany({})
+        .then(function(articles) {
+            res.send(articles);
+        })
+        .catch(function(err) {
+            res.json(err);
+        });
 });
 
 app.listen(PORT, function() {
