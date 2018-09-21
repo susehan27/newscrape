@@ -18,9 +18,9 @@ app.use(logger("dev"));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static("public"));
 
-var MONGOB_URI = process.env.MONGOB_URI || "mongodb://localhost/mongoHeadlines";
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
 mongoose.Promise = Promise;
-mongoose.connect(MONGOB_URI);
+mongoose.connect(MONGODB_URI);
 
 // app.get("/", function(req, res) {
 //     res.render("index", {db: Article});
