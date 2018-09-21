@@ -5,6 +5,10 @@ var mongoose = require("mongoose");
 var axios = require("axios");
 var cheerio = require("cheerio");
 
+//var exphbs = require("express-handlebars");
+// app.engine("handlebars", exphbs({defaultLayout: "main"}));
+// app.set("view engine", "handlebars");
+
 var db = require("./models");
 var PORT = 3000;
 
@@ -14,7 +18,13 @@ app.use(logger("dev"));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost/newscraper", { useNewUrlParser: true });
+var MONGOB_URI = process.env.MONGOB_URI || "mongodb://localhost/mongoHeadlines";
+mongoose.Promise = Promise;
+mongoose.connect(MONGOB_URI);
+
+// app.get("/", function(req, res) {
+//     res.render("index", {db: Article});
+// });
 
 app.get("/scrape", function(req, res) {
     axios.get("http://blogs.discovermagazine.com/").then(function(response) {
@@ -22,12 +32,6 @@ app.get("/scrape", function(req, res) {
 
         $("div.entry.clearfix").each(function(i, element) {
             var result = {};
-
-            // result.title = $(this).children("a").text();
-            // result.link = $(this).children("a").attr("href");
-            // result.authorDate = $(this).next().children("span").text();
-            // result.summary = $(this).next().next().text();
-
 
             result.title = $(this).children("h2").children("a").text();
             result.link = $(this).children("h2").children("a").attr("href");
